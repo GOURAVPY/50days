@@ -1,0 +1,52 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  width: 100%;
+  background-color: #000;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+.open-content {
+  height: 70vh;
+  width: 5vw;
+  border-radius: 30px;
+  background-color: #696c6c;
+  margin: 10px;
+  transition: all 0.5s linear;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+
+.active {
+  height: 70vh;
+  width: 50vw;
+  border-radius: 16px;
+  background-color: #79c7c7;
+  transition: all 0.5s linear;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+/* Background images */
+.img-1 { background-image: url("jpg/12-Makeup-_-Tools-1.webp"); }
+.img-2 { background-image: url("jpg/w.png"); }
+.img-3 { background-image: url("jpg/ws.jpg"); }
+.img-4 { background-image: url("jpg/necktiy.jpg"); }
+.img-5 { background-image: url("jpg/pokxit.jpg"); }
+.img-6 { background-image: url("jpg/razor.jpg"); }
+.img-7 { background-image: url("jpg/shoes.jpg"); }
