@@ -1,11 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>step--checker--app</title>
+  <meta charset="UTF-8">
+  <title>Step Progress Checker</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+  <div class="container">
+    <div class="progress">
+      <div class="bar" id="bar"></div>
+    </div>
+    <div id="steps">
+      <div class="step active">Step 1: Start</div>
+      <div class="step">Step 2: Continue</div>
+      <div class="step">Step 3: Almost there</div>
+      <div class="step">Step 4: Finished!</div>
+    </div>
+    <div class="buttons">
+      <button class="prev" id="prevBtn">Previous</button>
+      <button class="next" id="nextBtn">Next</button>
+    </div>
+  </div>
+  <script src="app.js"></script>
 </body>
 </html>
