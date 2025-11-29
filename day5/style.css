@@ -1,0 +1,57 @@
+body {
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.h2{
+    color: cadetblue;
+    text-transform: uppercase;
+}
+
+.header {
+    background-color: #023a03;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}
+
+.container {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.balaens {
+    font-size: 1.5em;
+    margin: 15px 0;
+}
+
+input,
+button {
+    padding: 10px;
+    margin: 5px 0;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+button:hover {
+      background:#023a03;
+      color: #ccc;
+    }
+    .transactions {
+      margin-top: 20px;
+    }
+    .transactions ul {
+      list-style: none;
+      padding: 0;
+    }
+    .transactions li {
+      background: #eef;
+      margin: 5px 0;
+      padding: 8px;
+      border-radius: 5px;
+    }
