@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Animated DateTime Clock</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --card: #12172a;
+      --accent: #5ef0ff;
+      --accent-2: #9d6bff;
+      --text: #eaf2ff;
+      --glow: 0 0 16px rgba(94, 240, 255, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(1200px 800px at 70% 20%, #11183a 0%, var(--bg) 60%);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+    }
+
+    .wrapper {
+      display: grid;
+      place-items: center;
+      height: 100%;
+      padding: 2rem;
+    }
+
+    .title {
+      margin-bottom: 1rem;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      color: #b7c3ff;
+      opacity: 0.8;
+    }
+
+    .clock {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(7, minmax(140px, 1fr));
+      align-items: start;
+      width: min(1200px, 95vw);
+    }
+
+    /* Card container (with label) */
+    .unit {
+      display: grid;
+      gap: 0.5rem;
+      align-content: start;
+    }
+
+    .label {
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a9b3d9;
+      opacity: 0.85;
+    }
+
+    /* Flip card */
+    .card {
+      position: relative;
+      perspective: 1200px;
+      filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.35));
+    }
+
+    .face {
+      position: relative;
+      width: 100%;
+      height: 120px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #141a33 0%, var(--card) 100%);
+      border: 1px solid rgba(94, 240, 255, 0.15);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums lining-nums;
+      color: var(--text);
+      font-size: clamp(1.8rem, 3vw + 0.5rem, 3rem);
+      letter-spacing: 0.02em;
+      overflow: hidden;
+      transition: transform 300ms ease, box-shadow 300ms ease, border-color 300ms ease;
+      box-shadow:
+        inset 0 -40px 80px rgba(157, 107, 255, 0.15),
+        inset 0 40px 80px rgba(94, 240, 255, 0.12),
+        var(--glow);
+    }
+
+    /* Glowing edge + subtle scan line */
+    .face::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 60%) ,
+        radial-gradient(100% 50% at 50% 0%, rgba(94, 240, 255, 0.25) 0%, transparent 65%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    /* Flip animation layers */
+    .flip {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #141a33 0%, var(--card) 100%);
+      border: 1px solid rgba(94, 240, 255, 0.15);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums lining-nums;
+      color: var(--text);
+      font-size: clamp(1.8rem, 3vw + 0.5rem, 3rem);
+      backface-visibility: hidden;
+      transform-origin: top;
+      transform: rotateX(0deg);
+      overflow: hidden;
+    }
+
+    /* Keyframe for flip */
+    @keyframes flipDown {
+      0%   { transform: rotateX(0deg); }
+      45%  { transform: rotateX(-95deg); }
+      55%  { transform: rotateX(-95deg); }
+      100% { transform: rotateX(-180deg); }
+    }
+
+    /* Neon accent on active flip */
+    .card.flipping .face {
+      border-color: rgba(157, 107, 255, 0.45);
+      box-shadow:
+        inset 0 -40px 80px rgba(157, 107, 255, 0.25),
+        inset 0 40px 80px rgba(94, 240, 255, 0.18),
+        0 0 24px rgba(157, 107, 255, 0.35),
+        var(--glow);
+    }
+
+    .flip.animate {
+      animation: flipDown 600ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    /* Divider dots between time units */
+    .dot {
+      align-self: center;
+      justify-self: center;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, var(--accent), var(--accent-2));
+      box-shadow: 0 0 12px rgba(94, 240, 255, 0.5);
+      opacity: 0.9;
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50%      { transform: scale(1.25); opacity: 1; }
+    }
+
+    /* Responsive: stack on small screens */
+    @media (max-width: 900px) {
+      .clock {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .dot { display: none; }
+    }
+    @media (max-width: 520px) {
+      .clock {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 1.25rem;
+      font-size: 0.85rem;
+      color: #8ea3d2;
+      opacity: 0.8;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="title">Live date & time with flip animation</div>
+
+    <div class="clock" id="clock">
+      <!-- Year -->
+      <div class="unit">
+        <div class="label">Year</div>
+        <div class="card" data-key="year">
+          <div class="face" data-current>—</div>
+          <div class="flip"></div>
+        </div>
+      </div>
+
+      <!-- Month -->
+      <div class="unit">
+        <div class="label">Month</div>
+        <div class="card" data-key="month">
+          <div class="face" data-current>—</div>
+          <div class="flip"></div>
+        </div>
+      </div>
+
+      <!-- Day -->
+      <div class="unit">
+        <div class="label">Day</div>
+        <div class="card" data-key="day">
+          <div class="face" data-current>—</div>
+          <div class="flip"></div>
+        </div>
+      </div>
+
+      <!-- Divider dot -->
+      <div class="dot" aria-hidden="true"></div>
+
+      <!-- Hours -->
+      <div class="unit">
+        <div class="label">Hours</div>
+        <div class="card" data-key="hours">
+          <div class="face" data-current>—</div>
+          <div class="flip"></div>
+        </div>
+      </div>
+
+      <!-- Minutes -->
+      <div class="unit">
+        <div class="label">Minutes</div>
+        <div class="card" data-key="minutes">
+          <div class="face" data-current>—</div>
+          <div class="flip"></div>
+        </div>
+      </div>
+
+      <!-- Seconds -->
+      <div class="unit">
+        <div class="label">Seconds</div>
+        <div class="card" data-key="seconds">
+          <div class="face" data-current>—</div>
+          <div class="flip"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">Format: YYYY | MM | DD — HH : MM : SS (local time)</div>
+  </div>
+
+  <script>
+    // Helpers
+    const pad2 = n => String(n).padStart(2, "0");
+
+    function nowParts() {
+      const d = new Date();
+      return {
+        year: d.getFullYear(),
+        month: pad2(d.getMonth() + 1),
+        day: pad2(d.getDate()),
+        hours: pad2(d.getHours()),
+        minutes: pad2(d.getMinutes()),
+        seconds: pad2(d.getSeconds()),
+      };
+    }
+
+    // Flip animation for a single card
+    function flipCard(card, nextValue) {
+      const face = card.querySelector("[data-current]");
+      const flip = card.querySelector(".flip");
+
+      const prevValue = face.textContent;
+      if (prevValue === String(nextValue)) return;
+
+      // Prepare next frame
+      flip.textContent = nextValue;
+      card.classList.add("flipping");
+      flip.classList.add("animate");
+
+      // When animation ends, set current to next
+      flip.addEventListener("animationend", () => {
+        face.textContent = nextValue;
+        card.classList.remove("flipping");
+        flip.classList.remove("animate");
+      }, { once: true });
+    }
+
+    // Initialize all cards and tick every second
+    function initClock() {
+      const clock = document.getElementById("clock");
+      const cards = {
+        year: clock.querySelector('[data-key="year"]'),
+        month: clock.querySelector('[data-key="month"]'),
+        day: clock.querySelector('[data-key="day"]'),
+        hours: clock.querySelector('[data-key="hours"]'),
+        minutes: clock.querySelector('[data-key="minutes"]'),
+        seconds: clock.querySelector('[data-key="seconds"]'),
+      };
+
+      // Initial render
+      const parts = nowParts();
+      Object.entries(parts).forEach(([k, v]) => {
+        cards[k].querySelector("[data-current]").textContent = v;
+      });
+
+      // Tick
+      setInterval(() => {
+        const next = nowParts();
+        Object.entries(next).forEach(([k, v]) => flipCard(cards[k], v));
+      }, 1000);
+    }
+
+    // Start
+    initClock();
+  </script>
+</body>
+</html>
