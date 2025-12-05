@@ -1,6 +1,7 @@
-const timelen = 60;
+const timelen = 0;
 let time = timelen * 60;
 const diply = document.querySelector(".displey");
+const btn = document.querySelector(".btn")
 setInterval(updeta, 1000);
 
 function updeta() {
@@ -9,5 +10,5 @@ function updeta() {
   seconds = seconds < 10 ? "0" + seconds : seconds;
   diply.innerHTML = `${minutes}:${seconds}`;
   console.log(`${minutes}:${seconds}`);
-  time--;
+  time++;
 }

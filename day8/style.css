@@ -1,0 +1,32 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: black;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.display {
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: gray;
+    border-radius: 10px;
+    font-size: 2rem;
+    font-weight: 500;
+    height: 10vh;
+    width: 10vw;
+    margin: 30px;
+}
+
+.btn {
+    padding: 20px;
+    background-color: skyblue;
+    margin: 10px;
+    border: none;
+    border-radius: 20px;
+}
