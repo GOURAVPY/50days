@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShopEasy</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="brand">
+      <span class="logo">🛍️</span>
+      <h1>ShopEasy</h1>
+    </div>
+    <div class="search-wrap">
+      <input id="searchInput" type="text" placeholder="Search products..." />
+    </div>
+    <button id="cartToggle" class="cart-btn">
+      Cart <span id="cartCount" class="badge">0</span>
+    </button>
+  </header>
+
+  <main class="container">
+    <aside class="filters">
+      <h3>Filters</h3>
+      <div class="filter-group">
+        <label class="filter-label">Category</label>
+        <select id="categoryFilter">
+          <option value="all">All</option>
+          <option value="electronics">Electronics</option>
+          <option value="fashion">Fashion</option>
+          <option value="home">Home</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Price</label>
+        <input type="range" id="priceRange" min="0" max="2000" value="2000" />
+        <div class="price-display">Up to ₹<span id="priceValue">2000</span></div>
+      </div>
+      <button id="resetFilters" class="btn outline">Reset</button>
+    </aside>
+
+    <section class="products">
+      <h2>Products</h2>
+      <div id="productGrid" class="grid"></div>
+    </section>
+  </main>
+
+  <div id="cartDrawer" class="cart-drawer">
+    <div class="cart-header">
+      <h3>Your Cart</h3>
+      <button id="closeCart" class="icon-btn" aria-label="Close cart">✕</button>
+    </div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-summary">
+        <span>Subtotal:</span>
+        <strong>₹<span id="cartSubtotal">0</span></strong>
+      </div>
+      <button id="checkoutBtn" class="btn primary">Checkout</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <footer class="footer">
+    <p>© <span id="year"></span> ShopEasy — Demo Store</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
