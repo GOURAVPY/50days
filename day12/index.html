@@ -1,12 +1,1243 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <title>Warrior vs Monsters — Ultimate</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg1: #fdfdfd;
+      --bg2: #f4f6fb;
+      --card: #ffffff;
+      --border: #dfe3eb;
+      --text: #222;
+      --muted: #596277;
+      --accent: #2e7d32;
+      --accent2: #1565c0;
+      --danger: #c62828;
+      --boss: #7b1fa2;
+      --gold: #c59600;
+      --pill: #eef1f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      background: linear-gradient(180deg, var(--bg1), var(--bg2));
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    h1, h2, h3 { margin: 0 0 8px; }
+    .game {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .bar {
+      height: 12px;
+      background: #e6ebf5;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .bar > span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #81c784);
+      width: 50%;
+      transition: width 0.2s ease;
+    }
+    .bar.enemy > span {
+      background: linear-gradient(90deg, #ef5350, #e57373);
+    }
+    .stat { font-size: 13px; color: var(--muted); }
+    .big {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+    .skills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+    button {
+      background: #f2f5fb;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: 0.15s ease;
+      font-weight: 600;
+    }
+    button:hover { transform: translateY(-1px); background: #e9eef7; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .log {
+      background: #f7f9fd;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      min-height: 160px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      line-height: 1.4;
+      overflow-y: auto;
+      max-height: 280px;
+    }
+    .loot {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .item {
+      background: #f9fbff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 6px;
+    }
+    .item .name { font-weight: 700; }
+    .item .meta { color: var(--muted); font-size: 12px; }
+    .equip-btn { background: #eaf3ff; border-color: #cfe0f7; }
+    .use-btn { background: #fff3ea; border-color: #f7dccf; }
+    .pill {
+      display: inline-block; padding: 4px 10px; border-radius: 999px;
+      border: 1px solid var(--border);
+      color: #333; font-weight: 700; font-size: 12px; background: var(--pill);
+    }
+    .pill.red { color: var(--danger); }
+    .pill.gold { color: var(--gold); }
+    .boss-tag { color: var(--boss); font-weight: 700; }
+    .footer {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .center { text-align: center; }
+    .shop { margin-top: 12px; display: grid; grid-template-columns: 1fr; gap: 8px; }
+    .shop-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #f7fbff;
+    }
+    .shop-item .meta { font-size: 12px; color: var(--muted); }
+    .gold { color: var(--gold); font-weight: 700; }
+    .statusline { font-size: 12px; color: #2c4a97; }
+    .subgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .tiny { font-size: 12px; color: var(--muted); }
+  </style>
 </head>
 <body>
-    
+  <div class="game">
+    <div class="card">
+      <h1>Warrior vs Monsters — Ultimate</h1>
+      <div class="stat">Attack, defend, use skills and specials. Pets help you, dungeons challenge you, shop builds your power.</div>
+
+      <div class="row" style="margin-top:8px">
+        <span class="pill" id="wavePill">Wave 1</span>
+        <span class="pill" id="levelPill">Level 1</span>
+        <span class="pill gold" id="goldPill">Gold 0</span>
+        <span class="pill" id="dungeonPill">No dungeon</span>
+      </div>
+
+      <div class="grid-2" style="margin-top:8px">
+        <div class="card">
+          <h3>Player</h3>
+          <div class="row">
+            <div class="big" id="playerName">Warrior</div>
+            <span class="pill" id="equipPill">No weapon</span>
+            <span class="pill" id="petPill">No pet</span>
+          </div>
+          <div class="row">
+            <div class="bar" style="flex:1"><span id="hpBar"></span></div>
+            <div id="hpText" class="stat">HP 100/100</div>
+          </div>
+          <div class="row subgrid">
+            <div class="tiny" id="playerStats1">ATK 10 • DEF 4 • Crit 10%</div>
+            <div class="tiny" id="playerStats2">STR 10 • AGI 10 • INT 10</div>
+            <div class="tiny" id="playerStats3">VIT 10 • LUK 10</div>
+          </div>
+          <div class="statusline" id="playerStatusLine"></div>
+          <div class="actions">
+            <button id="attackBtn">Attack</button>
+            <button id="defendBtn">Defend</button>
+            <button id="specialBtn">Weapon special</button>
+          </div>
+          <div class="skills">
+            <button id="skillFireball">Fireball</button>
+            <button id="skillHeal">Heal</button>
+            <button id="skillShieldBash">Shield Bash</button>
+            <button id="skillFocus">Focus</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Enemy</h3>
+          <div class="row">
+            <div class="big" id="enemyName">Slime</div>
+            <span class="pill red" id="enemyTier">Enemy</span>
+          </div>
+          <div class="row">
+            <div class="bar enemy" style="flex:1"><span id="enemyHpBar"></span></div>
+            <div id="enemyHpText" class="stat">HP 30/30</div>
+          </div>
+          <div class="row">
+            <div class="tiny" id="enemyStats">ATK 6 • DEF 2</div>
+          </div>
+          <div class="statusline" id="enemyStatusLine"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Battle log</h3>
+        <div id="log" class="log"></div>
+        <div class="footer">
+          Tip: Defend halves damage. Pets act each turn. Skills: Fireball (burn), Heal (restore), Shield Bash (stun), Focus (crit).
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Inventory</h3>
+      <div id="inventory" class="loot"></div>
+      <div class="footer">
+        Loot and gold drop after fights. Equip weapons and pets. Consumables can be used any time.
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>Shop & dungeon</h3>
+        <div class="shop" id="shopList"></div>
+        <div class="actions">
+          <button id="openShopBtn" disabled>Open shop</button>
+          <button id="startDungeonBtn">Start dungeon</button>
+          <button id="nextRoomBtn" disabled>Next room</button>
+        </div>
+        <div class="actions" style="margin-top:6px">
+          <button id="nextBtn" disabled>Next enemy</button>
+          <button id="healBtn" disabled>Rest (+20 HP)</button>
+          <button id="resetBtn">Reset run</button>
+        </div>
+        <div class="center stat" style="margin-top:8px" id="runInfo">Wave 1 • Level 1 • Enemies defeated: 0</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --------- Core data ---------
+    const basePlayer = {
+      name: "Warrior",
+      maxHp: 100,
+      hp: 100,
+      atk: 10,
+      def: 4,
+      crit: 0.10,
+      STR: 10, AGI: 10, INT: 10, VIT: 10, LUK: 10,
+      weapon: null,
+      pet: null,
+      inventory: [],
+      gold: 0,
+      statuses: {} // {burn, poison, bleed, freeze, shock, bless, weaken}
+    };
+
+    // Pets
+    const pets = [
+      { id:"wolf-cub", name:"Wolf Cub", ability:"bite", desc:"Deals small damage each turn." },
+      { id:"fairy", name:"Fairy", ability:"heal", desc:"Heals you a little each turn." },
+      { id:"golem", name:"Stone Golem", ability:"shield", desc:"+2 DEF while active." },
+      { id:"phoenix-chick", name:"Phoenix Chick", ability:"rebirth", desc:"Revives you once with 30% HP." },
+      { id:"dragonling", name:"Dragonling", ability:"burn", desc:"Applies burn occasionally." }
+    ];
+
+    // Enemies (base pool)
+    const enemies = [
+      { id:"slime", name: "Slime", maxHp: 30, atk: 6, def: 2, tier: "enemy", behavior: "basic" },
+      { id:"goblin", name: "Goblin", maxHp: 40, atk: 8, def: 3, tier: "enemy", behavior: "steal" },
+      { id:"skeleton", name: "Skeleton", maxHp: 50, atk: 9, def: 4, tier: "enemy", behavior: "guard" },
+      { id:"orc", name: "Orc", maxHp: 65, atk: 12, def: 5, tier: "enemy", behavior: "smash" },
+      { id:"wraith", name: "Wraith", maxHp: 70, atk: 11, def: 5, tier: "enemy", behavior: "poison" },
+      { id:"bandit", name: "Bandit", maxHp: 55, atk: 10, def: 3, tier: "enemy", behavior: "steal" },
+      { id:"troll", name: "Troll", maxHp: 90, atk: 14, def: 6, tier: "enemy", behavior: "regenerate" },
+      { id:"mage", name: "Dark Mage", maxHp: 70, atk: 12, def: 4, tier: "enemy", behavior: "arcane" },
+      { id:"wolf", name: "Dire Wolf", maxHp: 60, atk: 11, def: 3, tier: "enemy", behavior: "pack" },
+      { id:"giant", name: "Stone Giant", maxHp: 120, atk: 15, def: 8, tier: "enemy", behavior: "slam" },
+      // Bosses
+      { id:"minotaur", name: "Minotaur", maxHp: 120, atk: 16, def: 7, tier: "boss", behavior: "charge" },
+      { id:"dragon", name: "Dragon", maxHp: 160, atk: 20, def: 8, tier: "boss", behavior: "burn" },
+      { id:"hydra", name: "Hydra", maxHp: 130, atk: 18, def: 7, tier: "boss", behavior: "multiAttack" },
+      { id:"phoenix", name: "Phoenix", maxHp: 140, atk: 18, def: 6, tier: "boss", behavior: "rebirth" },
+      { id:"lich-king", name: "Lich King", maxHp: 220, atk: 24, def: 10, tier: "boss", behavior: "necrotic" }
+    ];
+
+    // Loot table: weapons, consumables, artifacts
+    const lootTable = [
+      // Base weapons
+      { id:"steel-sword", type:"weapon", name:"Steel Sword", atkBonus:6, defBonus:0, special:"heavyStrike", desc:"+6 ATK. Special: Heavy Strike (150% dmg)." },
+      { id:"shadow-dagger", type:"weapon", name:"Shadow Dagger", atkBonus:3, defBonus:0, special:"bleed", desc:"+3 ATK. Special: Bleed (damage over time)." },
+      { id:"guardian-shield", type:"weapon", name:"Guardian Shield", atkBonus:0, defBonus:4, special:"fortify", desc:"+4 DEF. Special: Fortify (block big damage)." },
+      { id:"arcane-staff", type:"weapon", name:"Arcane Staff", atkBonus:4, defBonus:0, special:"arcaneBurst", desc:"+4 ATK. Special: Arcane Burst (hits twice)." },
+      // New weapons
+      { id:"flame-sword", type:"weapon", name:"Flame Sword", atkBonus:5, defBonus:0, special:"ignite", desc:"+5 ATK. Special: Ignite (adds burn stacks)." },
+      { id:"ice-spear", type:"weapon", name:"Ice Spear", atkBonus:4, defBonus:0, special:"freezeStrike", desc:"+4 ATK. Special: Freeze Strike (chance to freeze)." },
+      { id:"thunder-hammer", type:"weapon", name:"Thunder Hammer", atkBonus:7, defBonus:0, special:"shockwave", desc:"+7 ATK. Special: Shockwave (stun)." },
+      { id:"vampire-blade", type:"weapon", name:"Vampire Blade", atkBonus:6, defBonus:0, special:"lifesteal", desc:"+6 ATK. Special: Lifesteal (heal from damage)." },
+      { id:"crystal-bow", type:"weapon", name:"Crystal Bow", atkBonus:5, defBonus:0, special:"piercingShot", desc:"+5 ATK. Special: Piercing Shot (ignores DEF)." },
+      { id:"storm-blade", type:"weapon", name:"Storm Blade", atkBonus:8, defBonus:0, special:"lightningStrike", desc:"+8 ATK. Special: Lightning Strike (stun chance)." },
+      { id:"earth-mace", type:"weapon", name:"Earth Mace", atkBonus:6, defBonus:2, special:"quake", desc:"+6 ATK, +2 DEF. Special: Quake (reduce DEF)." },
+      { id:"wind-fan", type:"weapon", name:"Wind Fan", atkBonus:4, defBonus:0, special:"gust", desc:"+4 ATK. Special: Gust (weaken attack)." },
+      { id:"holy-scepter", type:"weapon", name:"Holy Scepter", atkBonus:5, defBonus:3, special:"smite", desc:"+5 ATK, +3 DEF. Special: Smite (true damage)." },
+      { id:"shadow-claws", type:"weapon", name:"Shadow Claws", atkBonus:7, defBonus:0, special:"shadowAssault", desc:"+7 ATK. Special: Shadow Assault (multi-hit)." },
+      { id:"golden-armor", type:"weapon", name:"Golden Armor", atkBonus:0, defBonus:8, special:"reflect", desc:"+8 DEF. Special: Reflect (return damage)." },
+      { id:"blood-scythe", type:"weapon", name:"Blood Scythe", atkBonus:9, defBonus:0, special:"bloodRage", desc:"+9 ATK. Special: Blood Rage (dmg + heal)." },
+      // Consumables
+      { id:"hp-potion", type:"consumable", name:"Healing Potion", heal:30, desc:"Restores 30 HP." },
+      { id:"elixir", type:"consumable", name:"Elixir", heal:50, desc:"Restores 50 HP." },
+      { id:"bomb", type:"consumable", name:"Bomb", dmg:35, desc:"Deals 35 damage." },
+      { id:"mana-crystal", type:"consumable", name:"Mana Crystal", desc:"Boosts INT temporarily." },
+      { id:"trap-scroll", type:"consumable", name:"Trap Scroll", desc:"Deals 20 damage and stuns enemy." },
+      // Artifacts
+      { id:"dragon-scale", type:"artifact", name:"Dragon Scale", desc:"+10 VIT (max HP up)." },
+      { id:"mystic-orb", type:"artifact", name:"Mystic Orb", desc:"+5 STR, +5 INT." },
+      { id:"lucky-charm", type:"artifact", name:"Lucky Charm", desc:"+5 LUK (better crit & loot)." },
+      { id:"titan-heart", type:"artifact", name:"Titan Heart", desc:"+20 max HP." },
+      // Pets (lootable)
+      { id:"pet-wolf", type:"pet", name:"Pet: Wolf Cub", petRef:"wolf-cub", desc:"Bites each turn." },
+      { id:"pet-fairy", type:"pet", name:"Pet: Fairy", petRef:"fairy", desc:"Heals you each turn." },
+      { id:"pet-golem", type:"pet", name:"Pet: Stone Golem", petRef:"golem", desc:"+2 DEF." },
+      { id:"pet-phoenix", type:"pet", name:"Pet: Phoenix Chick", petRef:"phoenix-chick", desc:"Revives you once." },
+      { id:"pet-dragonling", type:"pet", name:"Pet: Dragonling", petRef:"dragonling", desc:"Occasional burn." }
+    ];
+
+    const shopItems = [
+      { id:"hp-potion", name:"Healing Potion", cost:20, desc:"+30 HP" },
+      { id:"elixir", name:"Elixir", cost:40, desc:"+50 HP" },
+      { id:"bomb", name:"Bomb", cost:30, desc:"35 damage" },
+      { id:"trap-scroll", name:"Trap Scroll", cost:45, desc:"20 damage + stun" },
+      { id:"mana-crystal", name:"Mana Crystal", cost:35, desc:"+INT boost (temporarily)" },
+      // Weapons (subset for shop)
+      { id:"steel-sword", name:"Steel Sword", cost:60, desc:"+6 ATK, Heavy Strike" },
+      { id:"guardian-shield", name:"Guardian Shield", cost:70, desc:"+4 DEF, Fortify" },
+      { id:"flame-sword", name:"Flame Sword", cost:75, desc:"+5 ATK, Ignite" },
+      { id:"ice-spear", name:"Ice Spear", cost:70, desc:"+4 ATK, Freeze Strike" },
+      { id:"vampire-blade", name:"Vampire Blade", cost:85, desc:"+6 ATK, Lifesteal" },
+      // Pets in shop
+      { id:"pet-wolf", name:"Pet: Wolf Cub", cost:90, desc:"Companion (bite)" },
+      { id:"pet-fairy", name:"Pet: Fairy", cost:95, desc:"Companion (heal)" }
+    ];
+
+    const dropRates = {
+      enemy: { weapon: 0.22, consumable: 0.55, artifact: 0.08, pet: 0.05, none: 0.10 },
+      boss:  { weapon: 0.55, consumable: 0.25, artifact: 0.12, pet: 0.05, none: 0.03 }
+    };
+
+    // --------- State ---------
+    let player = JSON.parse(localStorage.getItem("warriorUltimateSave")) || structuredClone(basePlayer);
+    let wave = Number(localStorage.getItem("warriorUltimateWave")) || 1;
+    let level = Number(localStorage.getItem("warriorUltimateLevel")) || 1;
+    let defeated = Number(localStorage.getItem("warriorUltimateDefeated")) || 0;
+
+    let enemy = null;
+    let defending = false;
+    let enemyStatuses = {};
+    let enemyState = {};
+
+    // Dungeon state
+    let dungeon = null; // { rooms, cleared, floor }
+    // --------- Utilities ---------
+    const $ = (sel) => document.querySelector(sel);
+    const logEl = $("#log");
+
+    function save() {
+      localStorage.setItem("warriorUltimateSave", JSON.stringify(player));
+      localStorage.setItem("warriorUltimateWave", wave);
+      localStorage.setItem("warriorUltimateLevel", level);
+      localStorage.setItem("warriorUltimateDefeated", defeated);
+      localStorage.setItem("warriorUltimateDungeon", JSON.stringify(dungeon));
+    }
+    function rng(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function chance(p) { return Math.random() < p; }
+    function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+    function capitalize(s) { return s[0].toUpperCase() + s.slice(1); }
+
+    function updateUI() {
+      $("#playerName").textContent = player.name;
+      $("#equipPill").textContent = player.weapon ? player.weapon.name : "No weapon";
+      $("#petPill").textContent = player.pet ? player.pet.name : "No pet";
+      const hpPct = Math.max(0, Math.round((player.hp / player.maxHp) * 100));
+      $("#hpBar").style.width = hpPct + "%";
+      $("#hpText").textContent = `HP ${player.hp}/${player.maxHp}`;
+
+      const atkShown = player.atk + (player.weapon?.atkBonus || 0) + Math.floor(player.STR * 0.2);
+      let defShown = player.def + (player.weapon?.defBonus || 0) + Math.floor(player.VIT * 0.1);
+      if (player.pet?.ability === "shield") defShown += 2;
+
+      const critShown = clamp(player.crit + player.LUK * 0.002, 0, 0.6);
+
+      $("#playerStats1").textContent = `ATK ${atkShown} • DEF ${defShown} • Crit ${Math.round(critShown*100)}%`;
+      $("#playerStats2").textContent = `STR ${player.STR} • AGI ${player.AGI} • INT ${player.INT}`;
+      $("#playerStats3").textContent = `VIT ${player.VIT} • LUK ${player.LUK}`;
+      $("#wavePill").textContent = `Wave ${wave}`;
+      $("#levelPill").textContent = `Level ${level}`;
+      $("#goldPill").textContent = `Gold ${player.gold}`;
+      $("#dungeonPill").textContent = dungeon ? `Dungeon: Room ${dungeon.cleared+1}/${dungeon.rooms}` : "No dungeon";
+
+      $("#playerStatusLine").textContent = statusLine(player.statuses);
+      if (enemy) {
+        $("#enemyName").textContent = enemy.name;
+        const ePct = Math.max(0, Math.round((enemy.hp / enemy.maxHp) * 100));
+        $("#enemyHpBar").style.width = ePct + "%";
+        $("#enemyHpText").textContent = `HP ${enemy.hp}/${enemy.maxHp}`;
+        $("#enemyStats").textContent = `ATK ${enemy.atk} • DEF ${enemy.def}`;
+        $("#enemyTier").textContent = enemy.tier === "boss" ? "Boss" : "Enemy";
+        $("#enemyTier").style.color = enemy.tier === "boss" ? "var(--boss)" : "var(--danger)";
+        $("#enemyStatusLine").textContent = statusLine(enemyStatuses);
+      }
+
+      const inBattle = !!enemy && player.hp > 0 && enemy.hp > 0;
+      $("#attackBtn").disabled = !inBattle;
+      $("#defendBtn").disabled = !inBattle;
+      $("#specialBtn").disabled = !inBattle || !player.weapon;
+      $("#skillFireball").disabled = !inBattle;
+      $("#skillHeal").disabled = !inBattle;
+      $("#skillShieldBash").disabled = !inBattle;
+      $("#skillFocus").disabled = !inBattle;
+
+      $("#nextBtn").disabled = !!enemy || player.hp <= 0;
+      $("#healBtn").disabled = !!enemy || player.hp >= player.maxHp || player.hp <= 0;
+      $("#openShopBtn").disabled = !!enemy || player.hp <= 0;
+      $("#startDungeonBtn").disabled = !!enemy || (dungeon !== null);
+      $("#nextRoomBtn").disabled = !!enemy || (dungeon === null);
+
+      renderInventory();
+      renderShop();
+      $("#runInfo").textContent = `Wave ${wave} • Level ${level} • Enemies defeated: ${defeated}`;
+    }
+
+    function statusLine(statuses) {
+      const parts = [];
+      for (const k in statuses) {
+        const s = statuses[k];
+        if (s && s.duration > 0) parts.push(`${capitalize(k)} x${s.stacks} (${s.duration})`);
+      }
+      return parts.length ? "Status: " + parts.join(" • ") : "";
+    }
+
+    function log(msg) {
+      const line = document.createElement("div");
+      line.textContent = msg;
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    // --------- Combat math ---------
+    function currentCrit() {
+      return clamp(player.crit + player.LUK * 0.002, 0, 0.6);
+    }
+
+    function dodgeChance() {
+      return clamp(0.05 + player.AGI * 0.002, 0, 0.35);
+    }
+
+    function computeDamage(baseAtk, targetDef, critRate = 0.12) {
+      const raw = Math.max(0, baseAtk - Math.floor(targetDef * 0.6));
+      const variance = rng(-2, 2);
+      let dmg = Math.max(0, raw + variance);
+      const isCrit = chance(critRate);
+      if (isCrit) dmg = Math.floor(dmg * 1.7);
+      return { dmg, isCrit };
+    }
+
+    function applyStatusesTick(target, statuses, targetName) {
+      if (statuses.burn && statuses.burn.duration > 0) {
+        const burn = statuses.burn.stacks * 4;
+        target.hp = Math.max(0, target.hp - burn);
+        log(`${targetName} takes ${burn} burn damage.`);
+        statuses.burn.duration--;
+      }
+      if (statuses.poison && statuses.poison.duration > 0) {
+        const poison = statuses.poison.stacks * 3;
+        target.hp = Math.max(0, target.hp - poison);
+        log(`${targetName} suffers ${poison} poison damage.`);
+        statuses.poison.duration--;
+      }
+      if (statuses.bleed && statuses.bleed.duration > 0) {
+        const bleed = statuses.bleed.stacks * 3;
+        target.hp = Math.max(0, target.hp - bleed);
+        log(`${targetName} bleeds for ${bleed} damage.`);
+        statuses.bleed.duration--;
+      }
+      if (statuses.bless && statuses.bless.duration > 0) {
+        statuses.bless.duration--;
+      }
+      if (statuses.weaken && statuses.weaken.duration > 0) {
+        statuses.weaken.duration--;
+      }
+      if (statuses.shock && statuses.shock.duration > 0) {
+        statuses.shock.duration--;
+      }
+      if (statuses.freeze && statuses.freeze.duration > 0) {
+        statuses.freeze.duration--;
+      }
+      // Cleanup
+      for (const k of ["burn","poison","bleed","freeze","bless","weaken","shock"]) {
+        if (statuses[k] && statuses[k].duration <= 0) delete statuses[k];
+      }
+    }
+    function isFrozen(statuses) { return !!(statuses.freeze && statuses.freeze.duration > 0); }
+    function addStatus(statuses, key, stacks, duration) {
+      if (!statuses[key]) statuses[key] = { stacks: 0, duration: 0 };
+      statuses[key].stacks += stacks;
+      statuses[key].duration = Math.max(statuses[key].duration, duration);
+    }
+
+    // --------- Pets ---------
+    function equipPetFromItem(item) {
+      const ref = item.petRef;
+      const petData = pets.find(p => p.id === ref);
+      if (!petData) return;
+      player.pet = structuredClone(petData);
+      log(`Equipped pet: ${player.pet.name}.`);
+    }
+
+    function petTurnStart() {
+      if (!player.pet || !enemy) return;
+      switch(player.pet.ability) {
+        case "bite":
+          enemy.hp = Math.max(0, enemy.hp - 4);
+          log(`${player.pet.name} bites enemy for 4.`);
+          break;
+        case "heal":
+          player.hp = Math.min(player.maxHp, player.hp + 3);
+          log(`${player.pet.name} heals you for 3.`);
+          break;
+        case "shield":
+          // passive DEF handled in updateUI (adds +2 DEF)
+          break;
+        case "burn":
+          if (chance(0.35)) {
+            addStatus(enemyStatuses, "burn", 1, 2);
+            log(`${player.pet.name} breathes a spark — burn applied.`);
+          }
+          break;
+        case "rebirth":
+          // passive; handled in checkEnd on death
+          break;
+      }
+    }
+
+    // --------- Player actions ---------
+    function playerAttack() {
+      const atkShown = player.atk + (player.weapon?.atkBonus || 0) + Math.floor(player.STR * 0.2);
+      const enemyDef = enemy.def - (enemyStatuses.weaken ? enemyStatuses.weaken.stacks : 0);
+      const { dmg, isCrit } = computeDamage(atkShown, Math.max(0, enemyDef), currentCrit());
+      enemy.hp = Math.max(0, enemy.hp - dmg);
+      log(`You attack for ${dmg}${isCrit ? " (CRIT!)" : ""}.`);
+    }
+
+    function playerDefend() {
+      defending = true;
+      log("You brace yourself. Incoming damage halved this turn.");
+    }
+
+    const specials = {
+      heavyStrike() {
+        const atkShown = player.atk + (player.weapon?.atkBonus || 0) + Math.floor(player.STR * 0.2);
+        const { dmg } = computeDamage(Math.floor(atkShown * 1.5), enemy.def, currentCrit());
+        enemy.hp = Math.max(0, enemy.hp - dmg);
+        log(`Special: Heavy Strike for ${dmg} damage.`);
+      },
+      bleed() {
+        addStatus(enemyStatuses, "bleed", 3, 3);
+        log("Special: Bleed applied (x3).");
+      },
+      fortify() {
+        defending = true;
+        addStatus(player.statuses, "bless", 1, 1);
+        log("Special: Fortify — strong block this turn (+Bless).");
+      },
+      arcaneBurst() {
+        const atkShown = player.atk + (player.weapon?.atkBonus || 0) + Math.floor(player.INT * 0.3);
+        const hit1 = computeDamage(atkShown, enemy.def, currentCrit()).dmg;
+        const hit2 = computeDamage(Math.floor(atkShown * 0.7), enemy.def, currentCrit()).dmg;
+        const total = hit1 + hit2;
+        enemy.hp = Math.max(0, enemy.hp - total);
+        log(`Special: Arcane Burst — two hits for ${total} total.`);
+      },
+      // New specials
+      ignite() {
+        const dmg = rng(10, 18);
+        enemy.hp = Math.max(0, enemy.hp - dmg);
+        addStatus(enemyStatuses, "burn", 2, 3);
+        log(`Special: Ignite for ${dmg}. Burn x2 applied.`);
+      },
+      freezeStrike() {
+        const dmg = rng(8, 14);
+        enemy.hp = Math.max(0, enemy.hp - dmg);
+        if (chance(0.4)) addStatus(enemyStatuses, "freeze", 1, 1);
+        log(`Special: Freeze Strike for ${dmg}. 40% freeze chance.`);
+      },
+      shockwave() {
+        const dmg = rng(12, 20);
+        enemy.hp = Math.max(0, enemy.hp - dmg);
+        addStatus(enemyStatuses, "freeze", 1, 1);
+        addStatus(enemyStatuses, "shock", 1, 2);
+        log(`Special: Shockwave hits for ${dmg}, stuns & shocks enemy.`);
+      },
+      lifesteal() {
+        const dmg = rng(10, 16);
+        enemy.hp = Math.max(0, enemy.hp - dmg);
+        const heal = Math.floor(dmg / 2);
+        player.hp = Math.min(player.maxHp, player.hp + heal);
+        log(`Special: Lifesteal deals ${dmg} and heals you for ${heal}.`);
+      },
+      piercingShot() {
+        const dmg = rng(14, 22);
+        enemy.hp = Math.max(0, enemy.hp - dmg);
+        log(`Special: Piercing Shot ignores defense, dealing ${dmg}.`);
+      },
+      lightningStrike() {
+        const dmg = rng(18, 28);
+        enemy.hp = Math.max(0, enemy.hp - dmg);
+        if (chance(0.3)) addStatus(enemyStatuses, "freeze", 1, 1);
+        log(`Special: Lightning Strike deals ${dmg} and stuns (30%).`);
+      },
+      quake() {
+        const dmg = rng(14, 22);
+        enemy.hp = Math.max(0, enemy.hp - dmg);
+        enemy.def = Math.max(0, enemy.def - 2);
+        addStatus(enemyStatuses, "weaken", 1, 2);
+        log(`Special: Quake for ${dmg}. Enemy DEF -2 & Weaken applied.`);
+      },
+      gust() {
+        const dmg = rng(10, 16);
+        enemy.hp = Math.max(0, enemy.hp - dmg);
+        enemyState.weakened = true;
+        log(`Special: Gust deals ${dmg}. Enemy’s next attack is weakened.`);
+      },
+      smite() {
+        const dmg = rng(20, 30);
+        enemy.hp = Math.max(0, enemy.hp - dmg);
+        log(`Special: Smite ignores defense, dealing ${dmg} holy damage.`);
+      },
+      shadowAssault() {
+        let total = 0;
+        for (let i=0; i<3; i++) total += rng(6, 10);
+        enemy.hp = Math.max(0, enemy.hp - total);
+        log(`Special: Shadow Assault slashes 3 times for ${total} total.`);
+      },
+      reflect() {
+        defending = true;
+        enemy.hp = Math.max(0, enemy.hp - 5);
+        log("Special: Reflect — you block and return 5 damage.");
+      },
+      bloodRage() {
+        const dmg = rng(16, 24);
+        enemy.hp = Math.max(0, enemy.hp - dmg);
+        player.hp = Math.min(player.maxHp, player.hp + Math.floor(dmg/3));
+        log(`Special: Blood Rage deals ${dmg} and heals you for ${Math.floor(dmg/3)}.`);
+      }
+    };
+
+    function useSpecial() {
+      if (!player.weapon) return;
+      const fn = specials[player.weapon.special];
+      if (fn) fn();
+    }
+
+    // --------- Skills ---------
+    const skills = {
+      fireball() {
+        const base = rng(12, 22) + Math.floor(player.INT * 0.3);
+        enemy.hp = Math.max(0, enemy.hp - base);
+        addStatus(enemyStatuses, "burn", 2, 3);
+        log(`Skill: Fireball for ${base}. Enemy is burning (x2).`);
+      },
+      heal() {
+        const healAmt = rng(22, 32) + Math.floor(player.VIT * 0.2);
+        const before = player.hp;
+        player.hp = Math.min(player.maxHp, player.hp + healAmt);
+        log(`Skill: Heal +${player.hp - before} HP.`);
+      },
+      shieldBash() {
+        const { dmg } = computeDamage(Math.floor((player.atk + (player.weapon?.atkBonus||0) + player.STR*0.2) * 0.8), enemy.def, currentCrit());
+        enemy.hp = Math.max(0, enemy.hp - dmg);
+        addStatus(enemyStatuses, "freeze", 1, 1);
+        log(`Skill: Shield Bash for ${dmg}. Enemy stunned (freeze).`);
+      },
+      focus() {
+        player.crit = clamp(player.crit + 0.05, 0, 0.6);
+        log("Skill: Focus — crit chance increases by 5% (cap 60%).");
+      }
+    };
+
+    // --------- Enemy AI ---------
+    function enemyTurn() {
+      if (!enemy || enemy.hp <= 0) return;
+
+      // Start-of-turn ticks and pet start turn
+      applyStatusesTick(enemy, enemyStatuses, enemy.name);
+      if (enemy.hp <= 0) return;
+
+      if (isFrozen(enemyStatuses)) {
+        log(`${enemy.name} is frozen and misses their turn.`);
+        applyStatusesTick(player, player.statuses, "You");
+        petTurnStart();
+        defending = false;
+        updateUI();
+        checkEnd();
+        return;
+      }
+
+      const defShown = player.def + (player.weapon?.defBonus || 0) + Math.floor(player.VIT * 0.1) + (player.pet?.ability === "shield" ? 2 : 0);
+
+      // Dodge check
+      if (chance(dodgeChance())) {
+        log("You dodge the attack!");
+        applyStatusesTick(player, player.statuses, "You");
+        petTurnStart();
+        defending = false;
+        updateUI();
+        checkEnd();
+        return;
+      }
+
+      // behavior selection
+      let action = "attack";
+      switch (enemy.behavior) {
+        case "basic":
+          action = chance(0.2) ? "power" : "attack"; break;
+        case "steal":
+          action = chance(0.25) ? "steal" : "attack"; break;
+        case "guard":
+          action = chance(0.3) ? "guard" : "attack"; break;
+        case "smash":
+          action = chance(0.3) ? "heavy" : "attack"; break;
+        case "poison":
+          action = chance(0.35) ? "poison" : "attack"; break;
+        case "regenerate":
+          action = chance(0.3) ? "regen" : "attack"; break;
+        case "arcane":
+          action = chance(0.4) ? "arcane" : "attack"; break;
+        case "pack":
+          action = chance(0.3) ? "pack-bite" : "attack"; break;
+        case "slam":
+          action = chance(0.35) ? "slam" : "attack"; break;
+        case "charge":
+          if (enemyState.charging) action = "charge-hit";
+          else action = chance(0.35) ? "charge" : "attack";
+          break;
+        case "burn":
+          action = chance(0.35) ? "breath" : "attack"; break;
+        case "multiAttack":
+          action = "multi"; break;
+        case "rebirth":
+          action = chance(0.4) ? "flame" : "attack"; break;
+        case "necrotic":
+          action = chance(0.4) ? "plague" : "attack"; break;
+      }
+
+      // weakened next attack
+      let weakenedFactor = enemyState.weakened ? 0.7 : 1.0;
+
+      function hitEnemy(baseAtkMult = 1.0) {
+        const shockPenalty = enemyStatuses.shock ? 0.85 : 1.0;
+        const { dmg, isCrit } = computeDamage(Math.floor(enemy.atk * baseAtkMult * shockPenalty), defShown, 0.08);
+        const finalDmg = Math.max(0, Math.floor((defending ? dmg * 0.5 : dmg) * weakenedFactor));
+        player.hp = Math.max(0, player.hp - finalDmg);
+        log(`${enemy.name} hits you for ${finalDmg}${isCrit ? " (CRIT!)" : ""}.`);
+      }
+
+      if (action === "attack") hitEnemy(1.0);
+      if (action === "power") hitEnemy(1.2);
+      if (action === "heavy") hitEnemy(1.5);
+      if (action === "steal") {
+        const stolen = rng(5, 15);
+        const take = Math.min(player.gold, stolen);
+        player.gold -= take;
+        log(`${enemy.name} steals ${take} gold!`);
+      }
+      if (action === "guard") {
+        enemy.def += 2;
+        log(`${enemy.name} raises its guard (+2 DEF this fight).`);
+      }
+      if (action === "poison") {
+        addStatus(player.statuses, "poison", 2, 4);
+        log(`${enemy.name} inflicts poison (x2 for 4 turns).`);
+      }
+      if (action === "regen") {
+        const heal = rng(8, 15);
+        enemy.hp = Math.min(enemy.maxHp, enemy.hp + heal);
+        log(`${enemy.name} regenerates ${heal} HP.`);
+      }
+      if (action === "arcane") {
+        const dmg = rng(12, 20);
+        player.hp = Math.max(0, player.hp - Math.floor((defending ? dmg * 0.7 : dmg) * weakenedFactor));
+        addStatus(player.statuses, "burn", 1, 2);
+        log(`${enemy.name} casts Arcane Blast for ${dmg} and applies burn.`);
+      }
+      if (action === "pack-bite") {
+        const dmg = rng(8, 12);
+        player.hp = Math.max(0, player.hp - Math.floor(dmg * weakenedFactor));
+        log(`${enemy.name} calls the pack! Extra bite for ${dmg}.`);
+      }
+      if (action === "slam") {
+        const dmg = rng(16, 24);
+        player.hp = Math.max(0, player.hp - Math.floor((defending ? dmg * 0.7 : dmg) * weakenedFactor));
+        addStatus(player.statuses, "freeze", 1, 1);
+        log(`${enemy.name} slams the ground for ${dmg}, stunning you.`);
+      }
+      if (action === "charge") {
+        enemyState.charging = true; enemyState.chargeTurns = 1;
+        log(`${enemy.name} lowers its head — charging up! Defend now!`);
+      }
+      if (action === "charge-hit") {
+        const dmg = rng(20, 30);
+        player.hp = Math.max(0, player.hp - Math.floor((defending ? dmg * 0.5 : dmg) * weakenedFactor));
+        log(`${enemy.name} unleashes a devastating charge for ${Math.floor((defending ? dmg * 0.5 : dmg) * weakenedFactor)}!`);
+        enemyState.charging = false; enemyState.chargeTurns = 0;
+      }
+      if (action === "breath") {
+        const breath = rng(14, 24);
+        player.hp = Math.max(0, player.hp - Math.floor((defending ? breath * 0.7 : breath) * weakenedFactor));
+        addStatus(player.statuses, "burn", 2, 3);
+        log(`${enemy.name} breathes fire for ${breath} and applies burn (x2).`);
+      }
+      if (action === "multi") {
+        const hits = rng(2, 3);
+        let total = 0;
+        for (let i=0; i<hits; i++) {
+          total += computeDamage(enemy.atk, defShown, 0.08).dmg;
+        }
+        total = Math.floor(total * weakenedFactor * (defending ? 0.7 : 1.0));
+        player.hp = Math.max(0, player.hp - total);
+        log(`${enemy.name} strikes ${hits} times for ${total} total damage!`);
+      }
+      if (action === "flame") {
+        const dmg = rng(14, 22);
+        player.hp = Math.max(0, player.hp - Math.floor((defending ? dmg * 0.7 : dmg) * weakenedFactor));
+        addStatus(player.statuses, "burn", 2, 3);
+        log(`${enemy.name} engulfs you in flames for ${dmg}.`);
+      }
+      if (action === "plague") {
+        addStatus(player.statuses, "poison", 3, 4);
+        log(`${enemy.name} casts Necrotic Plague (poison x3).`);
+      }
+
+      enemyState.weakened = false; // consumed
+      defending = false;
+      applyStatusesTick(player, player.statuses, "You");
+      petTurnStart();
+      updateUI();
+      checkEnd();
+    }
+
+    // --------- Loot, gold & inventory ---------
+    function dropLootAndGold(tier) {
+      const goldAmt = tier === "boss" ? rng(30, 60) : rng(10, 25);
+      const luckBoost = Math.floor(player.LUK * 0.5);
+      const totalGold = goldAmt + rng(0, luckBoost);
+      player.gold += totalGold;
+      log(`You looted ${totalGold} gold.`);
+
+      const rates = dropRates[tier];
+      const roll = Math.random();
+      let category = "none";
+      if (roll < rates.weapon) category = "weapon";
+      else if (roll < rates.weapon + rates.consumable) category = "consumable";
+      else if (roll < rates.weapon + rates.consumable + rates.artifact) category = "artifact";
+      else if (roll < rates.weapon + rates.consumable + rates.artifact + rates.pet) category = "pet";
+
+      if (category === "none") {
+        log("No item dropped.");
+        updateUI(); save(); return;
+      }
+
+      const pool = lootTable.filter(i => i.type === category);
+      const item = structuredClone(pool[rng(0, pool.length - 1)]);
+
+      if (item.type === "consumable") {
+        const found = player.inventory.find(i => i.id === item.id);
+        if (found) found.qty = (found.qty || 1) + 1;
+        else { item.qty = 1; player.inventory.push(item); }
+      } else if (item.type === "weapon") {
+        if (!player.inventory.find(i => i.id === item.id)) {
+          player.inventory.push(item);
+        } else {
+          player.gold += 25;
+          log("Duplicate weapon converted to 25 gold.");
+        }
+      } else if (item.type === "artifact") {
+        player.inventory.push(item);
+      } else if (item.type === "pet") {
+        if (!player.inventory.find(i => i.id === item.id)) {
+          player.inventory.push(item);
+          log("A companion joins as a loot item!");
+        } else {
+          player.gold += 40;
+          log("Duplicate pet token converted to 40 gold.");
+        }
+      }
+
+      log(`Loot dropped: ${item.name}.`);
+      updateUI(); save();
+    }
+
+    function applyArtifact(item) {
+      if (item.id === "dragon-scale") player.VIT += 10;
+      if (item.id === "mystic-orb") { player.STR += 5; player.INT += 5; }
+      if (item.id === "lucky-charm") player.LUK += 5;
+      if (item.id === "titan-heart") player.maxHp += 20;
+      player.hp = Math.min(player.maxHp, player.hp);
+      log(`Artifact applied: ${item.name}.`);
+    }
+
+    function renderInventory() {
+      const invEl = $("#inventory");
+      invEl.innerHTML = "";
+      if (!player.inventory.length) {
+        invEl.innerHTML = "<div class='stat'>No items yet. Defeat enemies for loot.</div>";
+        return;
+      }
+
+      player.inventory.forEach((item, idx) => {
+        const wrap = document.createElement("div");
+        wrap.className = "item";
+        const qty = item.qty ? ` • Qty: ${item.qty}` : "";
+        wrap.innerHTML = `
+          <div>
+            <div class="name">${item.name}</div>
+            <div class="meta">${item.desc}${qty}</div>
+          </div>
+          <div>
+            ${item.type === "weapon" ? `<button class="equip-btn" data-idx="${idx}">Equip</button>` : ""}
+            ${item.type === "consumable" ? `<button class="use-btn" data-idx="${idx}">Use</button>` : ""}
+            ${item.type === "artifact" ? `<button class="use-art-btn" data-idx="${idx}">Bind</button>` : ""}
+            ${item.type === "pet" ? `<button class="equip-pet-btn" data-idx="${idx}">Summon</button>` : ""}
+          </div>
+        `;
+        invEl.appendChild(wrap);
+      });
+
+      invEl.querySelectorAll(".equip-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const idx = Number(e.target.dataset.idx);
+          const item = player.inventory[idx];
+          player.weapon = item;
+          log(`Equipped: ${item.name}.`);
+          updateUI(); save();
+        });
+      });
+
+      invEl.querySelectorAll(".equip-pet-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const idx = Number(e.target.dataset.idx);
+          const item = player.inventory[idx];
+          equipPetFromItem(item);
+          updateUI(); save();
+        });
+      });
+
+      invEl.querySelectorAll(".use-art-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const idx = Number(e.target.dataset.idx);
+          const item = player.inventory[idx];
+          applyArtifact(item);
+          player.inventory.splice(idx, 1);
+          updateUI(); save();
+        });
+      });
+
+      invEl.querySelectorAll(".use-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const idx = Number(e.target.dataset.idx);
+          const item = player.inventory[idx];
+          if (item.id === "hp-potion" || item.id === "elixir") {
+            const before = player.hp;
+            player.hp = Math.min(player.maxHp, player.hp + (item.heal || 30));
+            log(`Used ${item.name}: +${player.hp - before} HP.`);
+          } else if (item.id === "bomb") {
+            const dmg = item.dmg;
+            if (enemy) {
+              enemy.hp = Math.max(0, enemy.hp - dmg);
+              log(`Used ${item.name}: ${dmg} damage to ${enemy.name}.`);
+              checkEnd();
+            } else log(`You saved a ${item.name} for later.`);
+          } else if (item.id === "mana-crystal") {
+            addStatus(player.statuses, "bless", 1, 3);
+            player.INT += 2;
+            log("Used Mana Crystal: +2 INT and Bless for 3 turns.");
+          } else if (item.id === "trap-scroll") {
+            const dmg = 20;
+            if (enemy) {
+              enemy.hp = Math.max(0, enemy.hp - dmg);
+              addStatus(enemyStatuses, "freeze", 1, 1);
+              log(`Trap Scroll: ${dmg} damage and enemy stunned.`);
+            } else log("Trap Scroll primed for next battle.");
+          }
+          item.qty = (item.qty || 1) - 1;
+          if (item.qty <= 0) player.inventory.splice(idx, 1);
+          updateUI(); save();
+        });
+      });
+    }
+
+    // --------- Shop ---------
+    function renderShop() {
+      const list = $("#shopList");
+      list.innerHTML = "";
+      shopItems.forEach(si => {
+        const wrap = document.createElement("div");
+        wrap.className = "shop-item";
+        wrap.innerHTML = `
+          <div>
+            <div class="name">${si.name}</div>
+            <div class="meta">${si.desc} • <span class="gold">${si.cost} gold</span></div>
+          </div>
+          <div>
+            <button class="buy-btn" data-id="${si.id}" ${player.gold < si.cost ? "disabled" : ""}>Buy</button>
+          </div>
+        `;
+        list.appendChild(wrap);
+      });
+
+      list.querySelectorAll(".buy-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => buyItem(e.target.dataset.id));
+      });
+    }
+
+    function buyItem(itemId) {
+      const si = shopItems.find(s => s.id === itemId);
+      if (!si) return;
+      if (player.gold < si.cost) { log("Not enough gold."); return; }
+
+      player.gold -= si.cost;
+      const item = structuredClone(lootTable.find(i => i.id === itemId));
+      if (!item) { log("Item not found."); return; }
+
+      if (item.type === "consumable" || item.type === "pet") {
+        const found = player.inventory.find(i => i.id === item.id);
+        if (found) found.qty = (found.qty || 1) + 1;
+        else { item.qty = 1; player.inventory.push(item); }
+      } else if (item.type === "weapon") {
+        if (!player.inventory.find(i => i.id === item.id)) {
+          player.inventory.push(item);
+        } else {
+          player.gold += Math.floor(si.cost * 0.6);
+          log("You already own this weapon. Refunded 60% of the cost.");
+        }
+      } else {
+        player.inventory.push(item);
+      }
+
+      log(`Bought ${si.name} for ${si.cost} gold.`);
+      updateUI(); save();
+    }
+
+    // --------- Dungeons ---------
+    function startDungeon() {
+      if (dungeon) { log("Already in a dungeon."); return; }
+      dungeon = { floor: 1, rooms: rng(3,5), cleared: 0 };
+      log(`You enter a dungeon with ${dungeon.rooms} rooms!`);
+      spawnEnemy(true); // force spawn dungeon enemy
+      updateUI(); save();
+    }
+
+    function nextRoom() {
+      if (!dungeon) return;
+      if (enemy) { log("Finish the battle before moving on."); return; }
+      dungeon.cleared++;
+      if (dungeon.cleared >= dungeon.rooms) {
+        log("Dungeon cleared! You find a treasure chest!");
+        dropDungeonLoot();
+        dungeon = null;
+        $("#nextRoomBtn").disabled = true;
+        updateUI(); save();
+      } else {
+        log(`Room ${dungeon.cleared+1}/${dungeon.rooms} begins.`);
+        spawnEnemy(true);
+      }
+    }
+
+    function dropDungeonLoot() {
+      const rareLoot = [
+        { id:"dragon-scale", type:"artifact", name:"Dragon Scale", desc:"+10 VIT (max HP up)." },
+        { id:"mystic-orb", type:"artifact", name:"Mystic Orb", desc:"+5 STR, +5 INT." },
+        { id:"lucky-charm", type:"artifact", name:"Lucky Charm", desc:"+5 LUK." },
+        { id:"titan-heart", type:"artifact", name:"Titan Heart", desc:"+20 max HP." }
+      ];
+      const item = structuredClone(rareLoot[rng(0, rareLoot.length-1)]);
+      player.inventory.push(item);
+      log(`Dungeon reward: ${item.name}!`);
+      updateUI(); save();
+    }
+
+    // --------- Flow ---------
+    function spawnEnemy(forceDungeon=false) {
+      const isBoss = (!forceDungeon && wave % 3 === 0) || (forceDungeon && dungeon.cleared === dungeon.rooms - 1);
+      const pool = enemies.filter(e => e.tier === (isBoss ? "boss" : "enemy"));
+      const base = structuredClone(pool[rng(0, pool.length - 1)]);
+
+      // Scale with level and dungeon floor
+      const floorScale = dungeon ? 1 + dungeon.floor * 0.12 : 1;
+      const hpScale = (1 + level * 0.22) * floorScale;
+      const atkScale = (1 + level * 0.15) * floorScale;
+      const defScale = (1 + level * 0.08) * floorScale;
+
+      base.maxHp = Math.floor(base.maxHp * hpScale);
+      base.hp = base.maxHp;
+      base.atk = Math.floor(base.atk * atkScale);
+      base.def = Math.floor(base.def * defScale);
+
+      enemy = base;
+      enemyStatuses = {};
+      enemyState = {};
+      defending = false;
+
+      log(`A ${enemy.tier === "boss" ? "BOSS " : ""}${enemy.name} appears!`);
+      updateUI();
+    }
+
+    function nextWave() {
+      wave++;
+      if (wave % 2 === 0) level++;
+      spawnEnemy(false);
+      $("#nextBtn").disabled = true;
+      $("#healBtn").disabled = true;
+      $("#openShopBtn").disabled = true;
+      updateUI(); save();
+    }
+
+    function rest() {
+      player.hp = Math.min(player.maxHp, player.hp + 20);
+      log("You take a moment to rest: +20 HP.");
+      updateUI();
+      $("#healBtn").disabled = true;
+      save();
+    }
+
+    function resetRun() {
+      player = structuredClone(basePlayer);
+      wave = 1; level = 1; defeated = 0;
+      enemy = null; enemyStatuses = {}; enemyState = {};
+      dungeon = null;
+      logEl.innerHTML = "";
+      spawnEnemy(false);
+      save();
+    }
+
+    function checkEnd() {
+      if (player.hp <= 0) {
+        // Phoenix pet revive
+        if (player.pet?.ability === "rebirth" && !player.pet.used) {
+          player.hp = Math.floor(player.maxHp * 0.3);
+          player.pet.used = true;
+          log(`${player.pet.name} revives you with 30% HP!`);
+          updateUI(); return false;
+        }
+        log("You fall in battle. Reset run to try again.");
+        enemy = null;
+        updateUI();
+        save();
+        return true;
+      }
+      if (enemy && enemy.hp <= 0) {
+        log(`You defeated the ${enemy.name}!`);
+        defeated++;
+        dropLootAndGold(enemy.tier);
+        enemy = null;
+        $("#nextBtn").disabled = false;
+        $("#healBtn").disabled = false;
+        $("#openShopBtn").disabled = false;
+        if (dungeon) $("#nextRoomBtn").disabled = false;
+        updateUI();
+        save();
+        return true;
+      }
+      return false;
+    }
+
+    // --------- Event listeners ---------
+    $("#attackBtn").addEventListener("click", () => {
+      if (!enemy || player.hp <= 0) return;
+      playerAttack();
+      if (!checkEnd()) enemyTurn();
+      updateUI();
+    });
+
+    $("#defendBtn").addEventListener("click", () => {
+      if (!enemy || player.hp <= 0) return;
+      playerDefend();
+      enemyTurn();
+      updateUI();
+      checkEnd();
+    });
+
+    $("#specialBtn").addEventListener("click", () => {
+      if (!enemy || player.hp <= 0 || !player.weapon) return;
+      useSpecial();
+      if (!checkEnd()) enemyTurn();
+      updateUI();
+    });
+
+    $("#skillFireball").addEventListener("click", () => {
+      if (!enemy || player.hp <= 0) return;
+      skills.fireball();
+      if (!checkEnd()) enemyTurn();
+      updateUI();
+    });
+
+    $("#skillHeal").addEventListener("click", () => {
+      if (!enemy || player.hp <= 0) return;
+      skills.heal();
+      enemyTurn();
+      updateUI();
+      checkEnd();
+    });
+
+    $("#skillShieldBash").addEventListener("click", () => {
+      if (!enemy || player.hp <= 0) return;
+      skills.shieldBash();
+      if (!checkEnd()) enemyTurn();
+      updateUI();
+    });
+
+    $("#skillFocus").addEventListener("click", () => {
+      if (!enemy || player.hp <= 0) return;
+      skills.focus();
+      enemyTurn();
+      updateUI();
+      checkEnd();
+    });
+
+    $("#nextBtn").addEventListener("click", () => nextWave());
+    $("#healBtn").addEventListener("click", () => rest());
+    $("#resetBtn").addEventListener("click", () => resetRun());
+    $("#openShopBtn").addEventListener("click", () => { log("Shop opened — buy items to prepare for the next battle."); renderShop(); });
+    $("#startDungeonBtn").addEventListener("click", () => startDungeon());
+    $("#nextRoomBtn").addEventListener("click", () => nextRoom());
+
+    // --------- Boot ---------
+    const savedDungeon = localStorage.getItem("warriorUltimateDungeon");
+    if (savedDungeon) dungeon = JSON.parse(savedDungeon);
+    if (!enemy) spawnEnemy(false);
+    updateUI();
+  </script>
 </body>
-<script src="app.js"></script>
 </html>
