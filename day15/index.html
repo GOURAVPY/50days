@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bank Operating System (Demo)</title>
+    <style>
+      :root {
+        --bg: #0f1216;
+        --card: #151a21;
+        --text: #e6e9ee;
+        --muted: #9aa3ad;
+        --primary: #4f8cff;
+        --primary-600: #3b6fd6;
+        --success: #2fb26e;
+        --danger: #d95252;
+        --warning: #e0a33b;
+        --border: #222832;
+        --input: #1c222b;
+        --focus: #7fb3ff;
+      }
+      [data-theme="light"] {
+        --bg: #f7f9fc;
+        --card: #ffffff;
+        --text: #0d1721;
+        --muted: #4b5a68;
+        --primary: #2c6bed;
+        --primary-600: #1f56c4;
+        --success: #1fa463;
+        --danger: #c53f3f;
+        --warning: #c48624;
+        --border: #e4e9f0;
+        --input: #f0f3f8;
+        --focus: #8bb7ff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans",
+          "Apple Color Emoji", "Segoe UI Emoji";
+        line-height: 1.5;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        background: var(--bg);
+        z-index: 10;
+      }
+      .brand {
+        font-weight: 700;
+        letter-spacing: 0.3px;
+      }
+      .theme-toggle {
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+      main {
+        max-width: 1100px;
+        margin: 20px auto;
+        padding: 0 16px 40px;
+      }
+      .grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 900px) {
+        .grid {
+          grid-template-columns: 1.1fr 1fr;
+        }
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+      }
+      h2,
+      h3 {
+        margin: 8px 0 12px;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .row {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr 1fr;
+      }
+      .row-3 {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      label {
+        font-size: 0.92rem;
+        margin-bottom: 6px;
+        display: inline-block;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--input);
+        color: var(--text);
+      }
+      input:focus,
+      select:focus {
+        outline: 2px solid var(--focus);
+        border-color: transparent;
+      }
+      .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        background: var(--primary);
+        color: white;
+        font-weight: 600;
+      }
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .btn.secondary {
+        background: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+      }
+      .btn.success {
+        background: var(--success);
+      }
+      .btn.danger {
+        background: var(--danger);
+      }
+      .btn.warning {
+        background: var(--warning);
+      }
+      .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .balance {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+      }
+      .flex {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .list {
+        margin-top: 10px;
+        border-top: 1px dashed var(--border);
+        padding-top: 8px;
+      }
+      .item {
+        display: grid;
+        grid-template-columns: 1.6fr 0.9fr 1fr;
+        gap: 8px;
+        padding: 10px 0;
+        border-bottom: 1px dashed var(--border);
+      }
+      .pill {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        border: 1px solid var(--border);
+        background: var(--input);
+      }
+      .alert {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+      }
+      .alert.info {
+        background: rgba(79, 140, 255, 0.12);
+        color: var(--text);
+      }
+      .alert.err {
+        background: rgba(217, 82, 82, 0.12);
+        color: var(--text);
+      }
+      .center {
+        text-align: center;
+      }
+      footer {
+        margin: 30px auto;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">Bank OS Demo</div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        🌙 Toggle theme
+      </button>
+    </header>
+
+    <main>
+      <section id="auth" class="card">
+        <h2>Access</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>Create account</h3>
+            <div class="row">
+              <div>
+                <label for="regName">Full name</label>
+                <input id="regName" placeholder="e.g., Gourav Sharma" />
+              </div>
+              <div>
+                <label for="regUser">Username</label>
+                <input id="regUser" placeholder="unique username" />
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <label for="regPin">PIN (4–8 digits)</label>
+                <input
+                  id="regPin"
+                  type="password"
+                  inputmode="numeric"
+                  maxlength="8"
+                  placeholder="••••"
+                />
+              </div>
+              <div>
+                <label for="regRate">Interest rate (%/month)</label>
+                <input
+                  id="regRate"
+                  type="number"
+                  min="0"
+                  max="20"
+                  step="0.01"
+                  value="0.5"
+                />
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn" id="createBtn">Create</button>
+              <button class="btn secondary" id="resetBtn">
+                Reset all (admin)
+              </button>
+            </div>
+            <div
+              id="regMsg"
+              class="alert info"
+              role="status"
+              style="display: none"
+            ></div>
+          </div>
+          <div class="card">
+            <h3>Login</h3>
+            <div class="row">
+              <div>
+                <label for="loginUser">Username</label>
+                <input id="loginUser" placeholder="your username" />
+              </div>
+              <div>
+                <label for="loginPin">PIN</label>
+                <input
+                  id="loginPin"
+                  type="password"
+                  inputmode="numeric"
+                  maxlength="8"
+                  placeholder="••••"
+                />
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn" id="loginBtn">Login</button>
+            </div>
+            <div
+              id="loginMsg"
+              class="alert err"
+              role="alert"
+              style="display: none"
+            ></div>
+            <div class="muted" style="margin-top: 8px">
+              Tip: Admin passcode for dashboard is “admin123”.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="dashboard" class="card" style="display: none">
+        <div class="flex">
+          <div>
+            <h2 id="welcome">Welcome</h2>
+            <div class="muted" id="userMeta"></div>
+          </div>
+          <div class="actions">
+            <button class="btn secondary" id="logoutBtn">Logout</button>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="card">
+            <h3>Balance</h3>
+            <div class="balance" id="balance">₹0.00</div>
+            <div class="muted">
+              Interest rate: <span id="rate">0%/month</span>
+            </div>
+            <div class="row-3" style="margin-top: 10px">
+              <div>
+                <label for="amtDeposit">Deposit amount</label>
+                <input
+                  id="amtDeposit"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+                <button
+                  class="btn success"
+                  id="depositBtn"
+                  style="margin-top: 8px"
+                >
+                  Deposit
+                </button>
+              </div>
+              <div>
+                <label for="amtWithdraw">Withdraw amount</label>
+                <input
+                  id="amtWithdraw"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+                <button
+                  class="btn danger"
+                  id="withdrawBtn"
+                  style="margin-top: 8px"
+                >
+                  Withdraw
+                </button>
+              </div>
+              <div>
+                <label for="amtTransfer">Transfer amount</label>
+                <input
+                  id="amtTransfer"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+                <label for="transferTo" style="margin-top: 8px"
+                  >To username</label
+                >
+                <input id="transferTo" placeholder="recipient username" />
+                <button
+                  class="btn warning"
+                  id="transferBtn"
+                  style="margin-top: 8px"
+                >
+                  Transfer
+                </button>
+              </div>
+            </div>
+            <div class="row" style="margin-top: 10px">
+              <div>
+                <label for="setRate">Set interest rate (%/month)</label>
+                <input
+                  id="setRate"
+                  type="number"
+                  min="0"
+                  max="20"
+                  step="0.01"
+                />
+              </div>
+              <div style="display: flex; align-items: flex-end; gap: 8px">
+                <button class="btn" id="updateRateBtn">Update rate</button>
+                <button
+                  class="btn"
+                  id="applyInterestBtn"
+                  title="Apply monthly interest"
+                >
+                  Apply interest
+                </button>
+              </div>
+            </div>
+            <div
+              id="txMsg"
+              class="alert info"
+              role="status"
+              style="display: none"
+            ></div>
+          </div>
+
+          <div class="card">
+            <h3>Transaction history</h3>
+            <div class="list" id="historyList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="admin" class="card" style="display: none">
+        <div class="flex">
+          <h2>Admin dashboard</h2>
+          <div class="actions">
+            <button class="btn secondary" id="closeAdminBtn">Close</button>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label for="adminPass">Admin passcode</label>
+            <input id="adminPass" type="password" placeholder="passcode" />
+          </div>
+          <div style="display: flex; align-items: flex-end">
+            <button class="btn" id="unlockAdminBtn">Unlock</button>
+          </div>
+        </div>
+        <div id="adminGuard" class="alert err" style="margin-top: 10px">
+          Locked. Enter correct passcode to view data.
+        </div>
+        <div id="adminContent" style="display: none">
+          <div class="grid" style="margin-top: 10px">
+            <div class="card">
+              <h3>Bank summary</h3>
+              <div class="item">
+                <div>Total accounts</div>
+                <div id="totalAccounts" class="pill">0</div>
+                <div></div>
+              </div>
+              <div class="item">
+                <div>Total deposits (sum balances)</div>
+                <div id="totalDeposits" class="pill">₹0.00</div>
+                <div></div>
+              </div>
+              <div class="item">
+                <div>Average balance</div>
+                <div id="avgBalance" class="pill">₹0.00</div>
+                <div></div>
+              </div>
+            </div>
+            <div class="card">
+              <h3>Accounts list</h3>
+              <div class="row">
+                <div>
+                  <label for="filterUser">Filter by username</label>
+                  <input id="filterUser" placeholder="type to filter…" />
+                </div>
+                <div style="display: flex; align-items: flex-end; gap: 8px">
+                  <button class="btn secondary" id="refreshAdminBtn">
+                    Refresh
+                  </button>
+                  <button
+                    class="btn danger"
+                    id="wipeBtn"
+                    title="Delete all bank data"
+                  >
+                    Wipe all data
+                  </button>
+                </div>
+              </div>
+              <div class="list" id="adminList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="card">
+        <div class="actions">
+          <button class="btn secondary" id="openAdminBtn">Admin</button>
+        </div>
+        <div class="muted" style="margin-top: 8px">
+          Demo only. Do not store real PINs or personal data.
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      Made for learning and portfolio demos. Data stored in your browser.
+    </footer>
+
+    <script>
+      (function () {
+        const KEY = "bank_accounts";
+        const THEME_KEY = "bank_theme";
+        let sessionUser = null;
+        let adminUnlocked = false;
+
+        // Utils
+        const fmt = new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        });
+        const now = () => new Date().toISOString();
+        const clamp = (n) => Math.max(0, Number(n || 0));
+        const getAll = () => JSON.parse(localStorage.getItem(KEY) || "[]");
+        const setAll = (arr) => localStorage.setItem(KEY, JSON.stringify(arr));
+        const findUser = (username) =>
+          getAll().find(
+            (u) =>
+              u.username.toLowerCase() === String(username || "").toLowerCase()
+          );
+        const saveUser = (user) => {
+          const all = getAll();
+          const idx = all.findIndex(
+            (u) => u.username.toLowerCase() === user.username.toLowerCase()
+          );
+          if (idx >= 0) all[idx] = user;
+          else all.push(user);
+          setAll(all);
+        };
+        const pushTx = (user, type, amount, meta = {}) => {
+          user.transactions.unshift({
+            id: crypto.randomUUID
+              ? crypto.randomUUID()
+              : Math.random().toString(36).slice(2),
+            ts: now(),
+            type,
+            amount: Number(amount),
+            balanceAfter: user.balance,
+            meta,
+          });
+        };
+
+        // Theme
+        const root = document.documentElement;
+        const themeToggle = document.getElementById("themeToggle");
+        const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
+        root.setAttribute("data-theme", savedTheme);
+        themeToggle.textContent =
+          savedTheme === "light" ? "🌙 Toggle theme" : "🌞 Toggle theme";
+        themeToggle.addEventListener("click", () => {
+          const next =
+            root.getAttribute("data-theme") === "light" ? "dark" : "light";
+          root.setAttribute("data-theme", next);
+          localStorage.setItem(THEME_KEY, next);
+          themeToggle.textContent =
+            next === "light" ? "🌙 Toggle theme" : "🌞 Toggle theme";
+        });
+
+        // Elements
+        const auth = document.getElementById("auth");
+        const dash = document.getElementById("dashboard");
+        const admin = document.getElementById("admin");
+        const openAdminBtn = document.getElementById("openAdminBtn");
+        const closeAdminBtn = document.getElementById("closeAdminBtn");
+        const unlockAdminBtn = document.getElementById("unlockAdminBtn");
+        const adminPass = document.getElementById("adminPass");
+        const adminGuard = document.getElementById("adminGuard");
+        const adminContent = document.getElementById("adminContent");
+        const totalAccounts = document.getElementById("totalAccounts");
+        const totalDeposits = document.getElementById("totalDeposits");
+        const avgBalance = document.getElementById("avgBalance");
+        const adminList = document.getElementById("adminList");
+        const refreshAdminBtn = document.getElementById("refreshAdminBtn");
+        const wipeBtn = document.getElementById("wipeBtn");
+        const filterUser = document.getElementById("filterUser");
+
+        const regName = document.getElementById("regName");
+        const regUser = document.getElementById("regUser");
+        const regPin = document.getElementById("regPin");
+        const regRate = document.getElementById("regRate");
+        const createBtn = document.getElementById("createBtn");
+        const resetBtn = document.getElementById("resetBtn");
+        const regMsg = document.getElementById("regMsg");
+
+        const loginUser = document.getElementById("loginUser");
+        const loginPin = document.getElementById("loginPin");
+        const loginBtn = document.getElementById("loginBtn");
+        const loginMsg = document.getElementById("loginMsg");
+
+        const welcome = document.getElementById("welcome");
+        const userMeta = document.getElementById("userMeta");
+        const balance = document.getElementById("balance");
+        const rate = document.getElementById("rate");
+        const amtDeposit = document.getElementById("amtDeposit");
+        const amtWithdraw = document.getElementById("amtWithdraw");
+        const amtTransfer = document.getElementById("amtTransfer");
+        const transferTo = document.getElementById("transferTo");
+        const depositBtn = document.getElementById("depositBtn");
+        const withdrawBtn = document.getElementById("withdrawBtn");
+        const transferBtn = document.getElementById("transferBtn");
+        const setRate = document.getElementById("setRate");
+        const updateRateBtn = document.getElementById("updateRateBtn");
+        const applyInterestBtn = document.getElementById("applyInterestBtn");
+        const txMsg = document.getElementById("txMsg");
+        const historyList = document.getElementById("historyList");
+        const logoutBtn = document.getElementById("logoutBtn");
+
+        // Navigation
+        const showAuth = () => {
+          auth.style.display = "";
+          dash.style.display = "none";
+          admin.style.display = "none";
+        };
+        const showDash = () => {
+          auth.style.display = "none";
+          dash.style.display = "";
+          admin.style.display = "none";
+        };
+        const showAdmin = () => {
+          admin.style.display = "";
+        };
+        const hideAdmin = () => {
+          admin.style.display = "none";
+        };
+
+        openAdminBtn.addEventListener("click", showAdmin);
+        closeAdminBtn.addEventListener("click", () => {
+          hideAdmin();
+          adminUnlocked = false;
+          adminPass.value = "";
+          adminContent.style.display = "none";
+          adminGuard.style.display = "";
+        });
+
+        // Account creation
+        createBtn.addEventListener("click", () => {
+          const name = String(regName.value || "").trim();
+          const username = String(regUser.value || "").trim();
+          const pin = String(regPin.value || "").trim();
+          const rateVal = Number(regRate.value || 0);
+
+          regMsg.style.display = "";
+          regMsg.className = "alert info";
+
+          if (!name || !username || !pin) {
+            regMsg.className = "alert err";
+            regMsg.textContent = "Please fill name, username, and PIN.";
+            return;
+          }
+          if (!/^\d{4,8}$/.test(pin)) {
+            regMsg.className = "alert err";
+            regMsg.textContent = "PIN must be 4–8 digits.";
+            return;
+          }
+          if (findUser(username)) {
+            regMsg.className = "alert err";
+            regMsg.textContent = "Username is already taken.";
+            return;
+          }
+          const user = {
+            id: crypto.randomUUID
+              ? crypto.randomUUID()
+              : Math.random().toString(36).slice(2),
+            name,
+            username,
+            pin: pin, // Demo only; do not store plain PINs in real apps.
+            balance: 0,
+            rate: Math.max(0, rateVal),
+            transactions: [],
+            createdAt: now(),
+            updatedAt: now(),
+          };
+          saveUser(user);
+          regMsg.textContent = "Account created. You can log in now.";
+          regName.value = "";
+          regUser.value = "";
+          regPin.value = "";
+          regRate.value = "0.5";
+        });
+
+        // Reset all (admin)
+        resetBtn.addEventListener("click", () => {
+          if (!confirm("Reset all accounts? This cannot be undone.")) return;
+          localStorage.removeItem(KEY);
+          regMsg.style.display = "";
+          regMsg.className = "alert info";
+          regMsg.textContent = "All bank data reset.";
+        });
+
+        // Login
+        loginBtn.addEventListener("click", () => {
+          const uname = String(loginUser.value || "").trim();
+          const pin = String(loginPin.value || "").trim();
+          loginMsg.style.display = "";
+
+          const user = findUser(uname);
+          if (!user || user.pin !== pin) {
+            loginMsg.className = "alert err";
+            loginMsg.textContent = "Invalid username or PIN.";
+            return;
+          }
+          sessionUser = user.username;
+          loginMsg.style.display = "none";
+          renderDashboard();
+          showDash();
+        });
+
+        // Logout
+        logoutBtn.addEventListener("click", () => {
+          sessionUser = null;
+          showAuth();
+        });
+
+        // Dashboard render
+        function renderDashboard() {
+          const user = findUser(sessionUser);
+          if (!user) return showAuth();
+          welcome.textContent = `Welcome, ${user.name}`;
+          userMeta.textContent = `User: @${user.username} • Created: ${new Date(
+            user.createdAt
+          ).toLocaleString()}`;
+          balance.textContent = fmt.format(user.balance);
+          rate.textContent = `${user.rate}%/month`;
+          setRate.value = user.rate;
+
+          historyList.innerHTML = "";
+          if (user.transactions.length === 0) {
+            historyList.innerHTML = `<div class="muted">No transactions yet.</div>`;
+          } else {
+            user.transactions.forEach((t) => {
+              const row = document.createElement("div");
+              row.className = "item";
+              const meta = t.meta || {};
+              row.innerHTML = `
+          <div>
+            <strong>${t.type.toUpperCase()}</strong>
+            <div class="muted" style="font-size:0.85rem">${new Date(
+              t.ts
+            ).toLocaleString()}</div>
+          </div>
+          <div>${fmt.format(t.amount)}</div>
+          <div class="muted">Bal: ${fmt.format(t.balanceAfter)} ${
+                meta.to ? "→ @" + meta.to : meta.from ? "← @" + meta.from : ""
+              }</div>
+        `;
+              historyList.appendChild(row);
+            });
+          }
+        }
+
+        // Actions: deposit, withdraw, transfer
+        depositBtn.addEventListener("click", () => {
+          const amt = clamp(amtDeposit.value);
+          txMsg.style.display = "";
+          if (amt <= 0) {
+            txMsg.className = "alert err";
+            txMsg.textContent = "Enter a positive deposit amount.";
+            return;
+          }
+          const user = findUser(sessionUser);
+          user.balance = Number((user.balance + amt).toFixed(2));
+          user.updatedAt = now();
+          pushTx(user, "deposit", amt);
+          saveUser(user);
+          amtDeposit.value = "";
+          txMsg.className = "alert info";
+          txMsg.textContent = `Deposited ${fmt.format(amt)}.`;
+          renderDashboard();
+        });
+
+        withdrawBtn.addEventListener("click", () => {
+          const amt = clamp(amtWithdraw.value);
+          txMsg.style.display = "";
+          const user = findUser(sessionUser);
+          if (amt <= 0) {
+            txMsg.className = "alert err";
+            txMsg.textContent = "Enter a positive withdrawal amount.";
+            return;
+          }
+          if (amt > user.balance) {
+            txMsg.className = "alert err";
+            txMsg.textContent = "Insufficient funds.";
+            return;
+          }
+          user.balance = Number((user.balance - amt).toFixed(2));
+          user.updatedAt = now();
+          pushTx(user, "withdraw", amt);
+          saveUser(user);
+          amtWithdraw.value = "";
+          txMsg.className = "alert info";
+          txMsg.textContent = `Withdrew ${fmt.format(amt)}.`;
+          renderDashboard();
+        });
+
+        transferBtn.addEventListener("click", () => {
+          const amt = clamp(amtTransfer.value);
+          const toUser = String(transferTo.value || "").trim();
+          txMsg.style.display = "";
+          if (amt <= 0 || !toUser) {
+            txMsg.className = "alert err";
+            txMsg.textContent = "Enter amount and recipient username.";
+            return;
+          }
+          const sender = findUser(sessionUser);
+          const recipient = findUser(toUser);
+          if (!recipient) {
+            txMsg.className = "alert err";
+            txMsg.textContent = "Recipient not found.";
+            return;
+          }
+          if (
+            recipient.username.toLowerCase() === sender.username.toLowerCase()
+          ) {
+            txMsg.className = "alert err";
+            txMsg.textContent = "Cannot transfer to yourself.";
+            return;
+          }
+          if (amt > sender.balance) {
+            txMsg.className = "alert err";
+            txMsg.textContent = "Insufficient funds.";
+            return;
+          }
+          // Do transfer
+          sender.balance = Number((sender.balance - amt).toFixed(2));
+          recipient.balance = Number((recipient.balance + amt).toFixed(2));
+          sender.updatedAt = now();
+          recipient.updatedAt = now();
+          pushTx(sender, "transfer_out", amt, { to: recipient.username });
+          pushTx(recipient, "transfer_in", amt, { from: sender.username });
+          saveUser(sender);
+          saveUser(recipient);
+          amtTransfer.value = "";
+          transferTo.value = "";
+          txMsg.className = "alert info";
+          txMsg.textContent = `Transferred ${fmt.format(amt)} to @${
+            recipient.username
+          }.`;
+          renderDashboard();
+        });
+
+        // Interest
+        updateRateBtn.addEventListener("click", () => {
+          const r = Number(setRate.value || 0);
+          const user = findUser(sessionUser);
+          user.rate = Math.max(0, r);
+          user.updatedAt = now();
+          saveUser(user);
+          txMsg.style.display = "";
+          txMsg.className = "alert info";
+          txMsg.textContent = `Rate set to ${user.rate}%/month.`;
+          renderDashboard();
+        });
+
+        applyInterestBtn.addEventListener("click", () => {
+          const user = findUser(sessionUser);
+          const gain = Number((user.balance * (user.rate / 100)).toFixed(2));
+          if (gain <= 0) {
+            txMsg.style.display = "";
+            txMsg.className = "alert err";
+            txMsg.textContent = "No interest to apply at current rate/balance.";
+            return;
+          }
+          user.balance = Number((user.balance + gain).toFixed(2));
+          user.updatedAt = now();
+          pushTx(user, "interest", gain, { rate: user.rate });
+          saveUser(user);
+          txMsg.style.display = "";
+          txMsg.className = "alert info";
+          txMsg.textContent = `Applied ${fmt.format(gain)} interest.`;
+          renderDashboard();
+        });
+
+        // Admin
+        unlockAdminBtn.addEventListener("click", () => {
+          const pass = adminPass.value.trim();
+          adminUnlocked = pass === "admin123";
+          adminGuard.style.display = adminUnlocked ? "none" : "";
+          adminContent.style.display = adminUnlocked ? "" : "none";
+          if (adminUnlocked) renderAdmin();
+        });
+
+        function renderAdmin() {
+          const all = getAll();
+          totalAccounts.textContent = String(all.length);
+          const total = all.reduce((s, u) => s + u.balance, 0);
+          totalDeposits.textContent = fmt.format(total);
+          avgBalance.textContent = fmt.format(
+            all.length ? total / all.length : 0
+          );
+
+          const query = String(filterUser.value || "").toLowerCase();
+          const filtered = query
+            ? all.filter((u) => u.username.toLowerCase().includes(query))
+            : all;
+
+          adminList.innerHTML = "";
+          if (filtered.length === 0) {
+            adminList.innerHTML = `<div class="muted">No accounts match the filter.</div>`;
+          } else {
+            filtered
+              .sort((a, b) => b.balance - a.balance)
+              .forEach((u) => {
+                const row = document.createElement("div");
+                row.className = "item";
+                row.innerHTML = `
+            <div>
+              <strong>${u.name}</strong> <span class="muted">@${
+                  u.username
+                }</span>
+              <div class="muted" style="font-size:0.85rem">Created: ${new Date(
+                u.createdAt
+              ).toLocaleString()}</div>
+            </div>
+            <div>${fmt.format(u.balance)}</div>
+            <div class="muted">${u.rate}%/mo • Tx: ${
+                  u.transactions.length
+                }</div>
+          `;
+                adminList.appendChild(row);
+              });
+          }
+        }
+
+        refreshAdminBtn.addEventListener("click", () => {
+          if (!adminUnlocked) return;
+          renderAdmin();
+        });
+
+        filterUser.addEventListener("input", () => {
+          if (!adminUnlocked) return;
+          renderAdmin();
+        });
+
+        wipeBtn.addEventListener("click", () => {
+          if (!adminUnlocked) return alert("Unlock admin first.");
+          if (!confirm("Wipe ALL bank data? This cannot be undone.")) return;
+          localStorage.removeItem(KEY);
+          renderAdmin();
+        });
+
+        // If previously logged in (optional session restore)
+        // No persistent session to keep demo simple.
+      })();
+    </script>
+  </body>
+</html>

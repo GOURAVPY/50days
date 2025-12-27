@@ -1,10 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+
 :root {
     --primary-color: #ffffff;
     --secondary-color: #f7f9fd;
     --font-family: 'Arial, sans-serif';
     --text-color: #333;
     --accent-color: #b8bcc0;
-    --text: "Oswald";
+    --text: "Roboto Mono";
     --heading: "Jersey 10";
 }
 
@@ -25,29 +27,32 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--text-color);
-    text-decoration: none;
-}
 
 .nav {
     display: flex;
     justify-content: space-around;
     background-color: var(--primary-color);
     padding: 30px 0;
-
+    
+}
+.logo {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-color);
+    text-decoration: none;
 }
 
+
 .logo {
-    padding: 0 0 0 80px;
+ padding:  0 0 0 20px;
+ background-color: aqua;
 }
 
 .nav a {
     font-size: 16px;
     color: var(--text-color);
-    margin: 0 15px;
+    font-family: var(--text);
     text-decoration: none;
 }
 
