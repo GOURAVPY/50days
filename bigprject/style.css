@@ -1,0 +1,61 @@
+:root {
+    --primary-color: #ffffff;
+    --secondary-color: #f7f9fd;
+    --font-family: 'Arial, sans-serif';
+    --text-color: #333;
+    --accent-color: #b8bcc0;
+    --text: "Oswald";
+    --heading: "Jersey 10";
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+}
+
+.container {
+    max-width: 80vw;
+    margin: 10px auto;
+    background-color: var(--primary-color);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-around;
+    background-color: var(--primary-color);
+    padding: 30px 0;
+
+}
+
+.logo {
+    padding: 0 0 0 80px;
+}
+
+.nav a {
+    font-size: 16px;
+    color: var(--text-color);
+    margin: 0 15px;
+    text-decoration: none;
+}
+
+.nav a:hover {
+    color: var(--accent-color);
+}
+
+.main-content {
+    padding: 40px 20px;
+    text-align: center;
+}
