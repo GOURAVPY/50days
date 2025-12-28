@@ -9,6 +9,12 @@
     --text: "Roboto Mono";
     --heading: "Jersey 10";
 }
+body.dark{
+    --primary-color: #ffffff;
+    --secondary-color:#f7f9fd;
+    --text-color:#333;
+    --accent-color:#b8bcc0;
+}
 
 body {
     margin: 0;
@@ -26,6 +32,8 @@ body {
     padding: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+
 
 
 .nav {
