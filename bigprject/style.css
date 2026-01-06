@@ -8,13 +8,17 @@
     --accent-color: #b8bcc0;
     --text: "Roboto Mono";
     --heading: "Jersey 10";
+    --ex: #fff;
+    --border-color: #111;
 }
 
 body.dark {
-    --primary-color: #1e1e1e;
-    --secondary-color: #121212;
-    --text-color: #e0e0e0;
-    --accent-color: #2c2c2c;
+    --primary-color: #171616;
+    --secondary-color: #0c0c0c;
+    --text-color: #dcdcdc;
+    --accent-color: #7e7d7d;
+    --border-color: #fff;
+    --button-color: #f0ecec;
 }
 
 body {
@@ -23,15 +27,17 @@ body {
     font-family: var(--font-family);
     background-color: var(--secondary-color);
     color: var(--text-color);
+    
 }
 
 .container {
-    max-width: 80vw;
-    margin: 10px auto;
+    max-width: 60vw;
+    margin: 20px auto;
     background-color: var(--primary-color);
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: -1;
 }
 
 .nav {
@@ -39,7 +45,11 @@ body {
     justify-content: space-around;
     background-color: var(--primary-color);
     padding: 30px 0;
+}
 
+.line {
+    color: var(--heading);
+    font-family: var(--text);
 }
 
 .logo {
@@ -76,14 +86,14 @@ body {
     height: 2em;
 }
 
-/* Hide default HTML checkbox */
+
 .switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-/* The slider */
+
 .slider {
     --background: #3a3a3c;
     position: absolute;
@@ -122,7 +132,57 @@ input:checked+.slider:before {
 .main-content {
     padding: 40px 20px;
     text-align: center;
+    
 }
+
+.card {
+    height: 33vh;
+    width: 12vw;
+    background-color: #3a3a3a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    position: relative;
+}
+
+@property --angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.card::after,
+.card::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-image: conic-gradient(from var(--angle),
+            transparent 70%,
+            blue);
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    z-index: -1;
+    padding: 10px;
+    border-radius: 20px;
+    animation: 3s spin linear infinite;
+}
+
+.card::before {
+    filter: blur(2rem);
+    opacity: 0.1;
+}
+
+@keyframes spin {
+    from {
+        --angle: 0deg;
+    }
+
+    to {
+        --angle: 360deg;
+    }
+}
+
 
 .info {
     display: flex;
@@ -131,14 +191,14 @@ input:checked+.slider:before {
 
 .info .cavar {
     transition: linear 0.1s;
-    height: 35px;
-    width: 25px;
-    margin: 30px;
-    background-color: --;
+    height: 45px;
+    width: 45px;
+    margin: 10px;
 }
 
 .info .cavar img {
     height: 30px;
+    display: flex;
     width: 30px;
 }
 
